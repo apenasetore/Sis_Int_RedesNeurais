@@ -1,40 +1,47 @@
 import numpy as np
-import pandas as pa
+import pandas as pd
 import dataprocess
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split    
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.neural_network import MLPRegressor, MLPClassifier
+from sklearn.neural_network import MLPRegressor
+from sklearn import metrics
 
-#processando os dados
-m = dataprocess.data_txt_to_matrix()
-(x_train, y_train, x_test, y_test) = dataprocess.generate_data(m)
+mlps = {}
+
+for i in range(32):
+    #processando os dados
+    m = dataprocess.data_txt_to_matrix()
+    (x_train, y_train, x_test, y_test) = dataprocess.generate_data(m)
+    
+    print(x_test[10])
+
+    scaler = StandardScaler()
+    scaler.fit(x_train)
+    x_train = scaler.transform(x_train)
+    scaler.fit(x_test)
+    x_test = scaler.transform(x_test)
+    scaler.fit(y_test)
+    y_test = scaler.transform(y_test)
+    scaler.fit(y_train)
+    y_train = scaler.transform(y_train)    
+   
+    
+
+    MLP = MLPRegressor(hidden_layer_sizes=(16,32,64,32,16), max_iter= 2048, learning_rate_init= 0.0128)
+    MLP.fit(x_train,y_train)
+
+    predictions = MLP.predict(x_test)
+    mrse = metrics.mean_squared_error(y_test, predictions)
+
+    mlps[mrse] = MLP
 
 
-Label = preprocessing.LabelEncoder()
-y_train = Label.fit_transform(y_train)
-y_test = Label.fit_transform(y_test)
+mlps = dict(sorted(mlps.items()))
 
-
-scaler = StandardScaler()
-scaler.fit(x_train)
-scaler.fit(x_test)
-
-#print(len(x_test))
-#print(len(x_train))
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-#print(len(x_test))
-#print((x_train))
-
-
-MLP = MLPClassifier(hidden_layer_sizes=(10,10,10), max_iter=1000)
-MLP.fit(x_train,y_train.ravel())
-
-predictions = MLP.predict(x_test)
-#print(len(y_test))
-#print(len(predictions))
-print(confusion_matrix(y_test,predictions))
-print(classification_report(y_test,predictions))
+erro_medio = list(mlps)[len(mlps)//2]
+print(erro_medio)
+print(mlps[erro_medio])

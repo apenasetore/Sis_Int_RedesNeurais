@@ -30,7 +30,7 @@ def data_txt_to_matrix():
 
 def generate_data(m):
 
-    classes = ["critico", "instavel", "potencialmente estavel", "estavel"]
+    classes = [3, 2, 1, 0]
 
     train_data = []
     res_train_data =[]
@@ -46,11 +46,11 @@ def generate_data(m):
         if int(line[0]) in corte:
             test_data.append(line[3:6])
             #res_test_data.append(int(line[7]))
-            res_test_data.append(classes[int(line[7])-1])
+            res_test_data.append([line[6]])
         else:
             train_data.append(line[3:6])
             #res_train_data.append(int(line[7]))
-            res_train_data.append(classes[int(line[7])-1])
+            res_train_data.append([line[6]])
         
 
     return (train_data, res_train_data, 
